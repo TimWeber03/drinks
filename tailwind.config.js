@@ -7,6 +7,11 @@ export default {
 
     content: [
         './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
+        // Livewire's WithPagination trait renders its own bundled pagination
+        // view (`livewire::tailwind`), not Laravel's — every paginated
+        // Livewire component in this app uses it, so its classes must be
+        // scanned too.
+        './vendor/livewire/livewire/src/Features/SupportPagination/views/*.blade.php',
         './storage/framework/views/*.php',
         './resources/views/**/*.blade.php',
     ],

@@ -16,9 +16,13 @@
                     wire:click="selectDrinker({{ $drinker->id }})"
                     class="flex flex-col items-center gap-3 rounded-2xl border border-line bg-surface p-5 text-center transition hover:border-accent hover:-translate-y-0.5 dark:border-line-dark dark:bg-surface-dark dark:hover:border-accent-dark"
                 >
-                    <span class="flex h-16 w-16 items-center justify-center rounded-full bg-accent/10 text-2xl font-semibold text-accent dark:bg-accent-dark/10 dark:text-accent-dark">
-                        {{ mb_strtoupper(mb_substr($drinker->name, 0, 1)) }}
-                    </span>
+                    @if ($drinker->avatar_path)
+                        <img src="{{ asset('storage/'.$drinker->avatar_path) }}" alt="{{ $drinker->name }}" class="h-16 w-16 rounded-full object-cover">
+                    @else
+                        <span class="flex h-16 w-16 items-center justify-center rounded-full bg-accent/10 text-2xl font-semibold text-accent dark:bg-accent-dark/10 dark:text-accent-dark">
+                            {{ mb_strtoupper(mb_substr($drinker->name, 0, 1)) }}
+                        </span>
+                    @endif
                     <span class="font-semibold text-ink dark:text-ink-dark">{{ $drinker->name }}</span>
                     <span @class([
                         'text-sm tabular-nums',

@@ -4,13 +4,16 @@ namespace App\Livewire\Admin;
 
 use App\Models\Drinker;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 
 #[Layout('layouts.app')]
 class DrinkerManager extends Component
 {
+    use WithFileUploads;
     use WithPagination;
 
     public bool $showForm = false;
@@ -18,6 +21,8 @@ class DrinkerManager extends Component
     public ?int $editingId = null;
 
     public string $name = '';
+
+    public $avatar = null;
 
     public bool $active = true;
 
@@ -44,19 +49,28 @@ class DrinkerManager extends Component
     {
         $data = $this->validate([
             'name' => ['required', 'string', 'max:255'],
+            'avatar' => ['nullable', 'image', 'max:2048'],
         ]);
 
-        if ($this->editingId) {
-            Drinker::findOrFail($this->editingId)->update([
-                'name' => $data['name'],
-                'active' => $this->active,
-            ]);
+        $attributes = [
+            'name' => $data['name'],
+            'active' => $this->active,
+        ];
+
+        $drinker = $this->editingId ? Drinker::findOrFail($this->editingId) : null;
+
+        if ($this->avatar) {
+            if ($drinker?->avatar_path) {
+                Storage::disk('public')->delete($drinker->avatar_path);
+            }
+
+            $attributes['avatar_path'] = $this->avatar->store('avatars', 'public');
+        }
+
+        if ($drinker) {
+            $drinker->update($attributes);
         } else {
-            Drinker::create([
-                'name' => $data['name'],
-                'active' => $this->active,
-                'balance' => 0,
-            ]);
+            Drinker::create($attributes + ['balance' => 0]);
         }
 
         $this->resetForm();
@@ -100,7 +114,7 @@ class DrinkerManager extends Component
 
     private function resetForm(): void
     {
-        $this->reset(['editingId', 'name', 'showForm']);
+        $this->reset(['editingId', 'name', 'avatar', 'showForm']);
         $this->active = true;
         $this->resetErrorBag();
     }

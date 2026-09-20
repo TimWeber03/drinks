@@ -14,6 +14,12 @@
                 <x-input-error :messages="$errors->get('name')" class="mt-2" />
             </div>
 
+            <div>
+                <x-input-label for="avatar" value="Avatar (optional)" />
+                <input id="avatar" type="file" wire:model="avatar" accept="image/*" class="mt-1 block w-full text-sm text-muted dark:text-muted-dark">
+                <x-input-error :messages="$errors->get('avatar')" class="mt-2" />
+            </div>
+
             <label class="flex items-center gap-2 self-end">
                 <input type="checkbox" wire:model="active" class="rounded border-line text-accent focus:ring-accent dark:border-line-dark dark:bg-surface-dark">
                 <span class="text-sm text-ink dark:text-ink-dark">Active (visible in the kiosk)</span>
@@ -39,7 +45,18 @@
             <tbody class="divide-y divide-line dark:divide-line-dark">
                 @foreach ($drinkers as $drinker)
                     <tr>
-                        <td class="px-4 py-3 font-medium text-ink dark:text-ink-dark">{{ $drinker->name }}</td>
+                        <td class="px-4 py-3">
+                            <div class="flex items-center gap-3">
+                                @if ($drinker->avatar_path)
+                                    <img src="{{ asset('storage/'.$drinker->avatar_path) }}" alt="{{ $drinker->name }}" class="h-8 w-8 rounded-full object-cover">
+                                @else
+                                    <span class="flex h-8 w-8 items-center justify-center rounded-full bg-accent/10 text-xs font-semibold text-accent dark:bg-accent-dark/10 dark:text-accent-dark">
+                                        {{ mb_strtoupper(mb_substr($drinker->name, 0, 1)) }}
+                                    </span>
+                                @endif
+                                <span class="font-medium text-ink dark:text-ink-dark">{{ $drinker->name }}</span>
+                            </div>
+                        </td>
                         <td @class([
                             'px-4 py-3 tabular-nums',
                             'text-ink dark:text-ink-dark' => $drinker->balance >= 0,

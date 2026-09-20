@@ -7,6 +7,8 @@ use App\Livewire\Admin\DrinkerManager;
 use App\Models\Drinker;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -64,5 +66,40 @@ class DrinkerManagerTest extends TestCase
             ->assertHasErrors('adjustmentAmount');
 
         $this->assertSame('5.00', $drinker->fresh()->balance);
+    }
+
+    public function test_admin_can_upload_an_avatar_for_a_drinker(): void
+    {
+        Storage::fake('public');
+        $this->actingAs(User::factory()->create());
+
+        Livewire::test(DrinkerManager::class)
+            ->call('create')
+            ->set('name', 'Dave')
+            ->set('avatar', UploadedFile::fake()->image('dave.jpg'))
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $drinker = Drinker::where('name', 'Dave')->firstOrFail();
+        $this->assertNotNull($drinker->avatar_path);
+        Storage::disk('public')->assertExists($drinker->avatar_path);
+    }
+
+    public function test_replacing_a_drinkers_avatar_deletes_the_old_file(): void
+    {
+        Storage::fake('public');
+        $this->actingAs(User::factory()->create());
+
+        $oldPath = UploadedFile::fake()->image('old.jpg')->store('avatars', 'public');
+        $drinker = Drinker::factory()->create(['avatar_path' => $oldPath]);
+
+        Livewire::test(DrinkerManager::class)
+            ->call('edit', $drinker->id)
+            ->set('avatar', UploadedFile::fake()->image('new.jpg'))
+            ->call('save');
+
+        Storage::disk('public')->assertMissing($oldPath);
+        Storage::disk('public')->assertExists($drinker->fresh()->avatar_path);
+        $this->assertNotSame($oldPath, $drinker->fresh()->avatar_path);
     }
 }

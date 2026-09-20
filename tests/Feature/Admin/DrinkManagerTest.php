@@ -6,6 +6,8 @@ use App\Livewire\Admin\DrinkManager;
 use App\Models\Drink;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -85,5 +87,23 @@ class DrinkManagerTest extends TestCase
             ->assertHasNoErrors();
 
         $this->assertDatabaseHas('drinks', ['name' => 'Mate', 'stock_tracked' => false, 'stock' => 0]);
+    }
+
+    public function test_replacing_a_drinks_image_deletes_the_old_file(): void
+    {
+        Storage::fake('public');
+        $this->actingAs(User::factory()->create());
+
+        $oldPath = UploadedFile::fake()->image('old.jpg')->store('drinks', 'public');
+        $drink = Drink::factory()->create(['image_path' => $oldPath]);
+
+        Livewire::test(DrinkManager::class)
+            ->call('edit', $drink->id)
+            ->set('image', UploadedFile::fake()->image('new.jpg'))
+            ->call('save');
+
+        Storage::disk('public')->assertMissing($oldPath);
+        Storage::disk('public')->assertExists($drink->fresh()->image_path);
+        $this->assertNotSame($oldPath, $drink->fresh()->image_path);
     }
 }

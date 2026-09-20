@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\TransactionType;
+use App\Exceptions\OutOfStockException;
 use Database\Factories\DrinkerFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -36,15 +37,30 @@ class Drinker extends Model
     }
 
     /**
-     * Deduct the price of a drink from this drinker's balance.
+     * Deduct the price of a drink from this drinker's balance, decrementing
+     * the drink's stock first if it's stock-tracked.
+     *
+     * @throws OutOfStockException
      */
     public function buy(Drink $drink): Transaction
     {
-        return $this->applyBalanceChange(
-            amount: -$drink->price,
-            type: TransactionType::Purchase,
-            drink: $drink,
-        );
+        return DB::transaction(function () use ($drink) {
+            $lockedDrink = Drink::query()->lockForUpdate()->findOrFail($drink->id);
+
+            if ($lockedDrink->isOutOfStock()) {
+                throw new OutOfStockException($lockedDrink);
+            }
+
+            if ($lockedDrink->stock_tracked) {
+                $lockedDrink->decrement('stock');
+            }
+
+            return $this->applyBalanceChange(
+                amount: -$lockedDrink->price,
+                type: TransactionType::Purchase,
+                drink: $lockedDrink,
+            );
+        });
     }
 
     /**

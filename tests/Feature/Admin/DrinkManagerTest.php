@@ -54,4 +54,36 @@ class DrinkManagerTest extends TestCase
 
         $this->assertFalse($drink->fresh()->active);
     }
+
+    public function test_admin_can_enable_stock_tracking_with_a_quantity(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        Livewire::test(DrinkManager::class)
+            ->call('create')
+            ->set('name', 'Mate')
+            ->set('price', '1.50')
+            ->set('stockTracked', true)
+            ->set('stock', '12')
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseHas('drinks', ['name' => 'Mate', 'stock_tracked' => true, 'stock' => 12]);
+    }
+
+    public function test_stock_is_forced_to_zero_when_tracking_is_disabled(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        Livewire::test(DrinkManager::class)
+            ->call('create')
+            ->set('name', 'Mate')
+            ->set('price', '1.50')
+            ->set('stockTracked', false)
+            ->set('stock', '12')
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseHas('drinks', ['name' => 'Mate', 'stock_tracked' => false, 'stock' => 0]);
+    }
 }

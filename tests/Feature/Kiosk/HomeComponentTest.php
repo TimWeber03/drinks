@@ -76,4 +76,42 @@ class HomeComponentTest extends TestCase
 
         $this->assertSame('0.00', $drinker->fresh()->balance);
     }
+
+    public function test_out_of_stock_drinks_are_shown_as_out_of_stock_by_default(): void
+    {
+        $drinker = Drinker::factory()->create();
+        Drink::factory()->create(['name' => 'Mate', 'stock_tracked' => true, 'stock' => 0]);
+
+        Livewire::test(Home::class)
+            ->call('selectDrinker', $drinker->id)
+            ->assertSee('Mate')
+            ->assertSee('Out of stock');
+    }
+
+    public function test_hiding_out_of_stock_drinks_removes_them_while_keeping_others(): void
+    {
+        $drinker = Drinker::factory()->create();
+        Drink::factory()->create(['name' => 'Mate', 'stock_tracked' => true, 'stock' => 0]);
+        Drink::factory()->create(['name' => 'Cola', 'stock_tracked' => true, 'stock' => 5]);
+
+        Livewire::test(Home::class)
+            ->call('selectDrinker', $drinker->id)
+            ->set('showOutOfStock', false)
+            ->assertDontSee('Mate')
+            ->assertSee('Cola');
+    }
+
+    public function test_buying_an_out_of_stock_drink_is_blocked_and_balance_is_unchanged(): void
+    {
+        $drinker = Drinker::factory()->create(['balance' => 10]);
+        $drink = Drink::factory()->create(['name' => 'Mate', 'price' => 1, 'stock_tracked' => true, 'stock' => 0]);
+
+        Livewire::test(Home::class)
+            ->call('selectDrinker', $drinker->id)
+            ->call('buy', $drink->id)
+            ->assertHasErrors('stock')
+            ->assertSet('view', 'drinks');
+
+        $this->assertSame('10.00', $drinker->fresh()->balance);
+    }
 }

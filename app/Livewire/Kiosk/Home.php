@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Kiosk;
 
+use App\Exceptions\OutOfStockException;
 use App\Models\Drink;
 use App\Models\Drinker;
 use Livewire\Attributes\Layout;
@@ -21,6 +22,8 @@ class Home extends Component
 
     public string $depositAmount = '';
 
+    public bool $showOutOfStock = true;
+
     public function selectDrinker(int $drinkerId): void
     {
         $this->selectedDrinkerId = $drinkerId;
@@ -29,10 +32,18 @@ class Home extends Component
 
     public function buy(int $drinkId): void
     {
+        $this->resetErrorBag('stock');
+
         $drinker = Drinker::findOrFail($this->selectedDrinkerId);
         $drink = Drink::findOrFail($drinkId);
 
-        $drinker->buy($drink);
+        try {
+            $drinker->buy($drink);
+        } catch (OutOfStockException) {
+            $this->addError('stock', "{$drink->name} just sold out.");
+
+            return;
+        }
 
         $this->confirmationMessage = "{$drinker->name} bought a {$drink->name} for ".number_format($drink->price, 2).' €';
         $this->view = 'confirmation';
@@ -93,7 +104,13 @@ class Home extends Component
             'selectedDrinker' => $this->selectedDrinkerId
                 ? Drinker::find($this->selectedDrinkerId)
                 : null,
-            'drinks' => Drink::query()->where('active', true)->orderBy('name')->get(),
+            'drinks' => Drink::query()
+                ->where('active', true)
+                ->when(! $this->showOutOfStock, fn ($query) => $query->where(
+                    fn ($q) => $q->where('stock_tracked', false)->orWhere('stock', '>', 0)
+                ))
+                ->orderBy('name')
+                ->get(),
         ]);
     }
 }

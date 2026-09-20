@@ -71,23 +71,46 @@
             </div>
         </div>
 
+        @error('stock')
+            <p class="mb-4 text-sm font-medium text-negative dark:text-negative-dark">{{ $message }}</p>
+        @enderror
+
+        <label class="mb-4 flex items-center gap-2 text-sm text-muted dark:text-muted-dark">
+            <input type="checkbox" wire:model.live="showOutOfStock" class="rounded border-line text-accent focus:ring-accent dark:border-line-dark dark:bg-surface-dark">
+            Show out-of-stock items
+        </label>
+
         <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
             @forelse ($drinks as $drink)
-                <button
-                    type="button"
-                    wire:click="buy({{ $drink->id }})"
-                    class="flex flex-col items-center gap-3 rounded-2xl border border-line bg-surface p-5 text-center transition hover:border-accent hover:-translate-y-0.5 dark:border-line-dark dark:bg-surface-dark dark:hover:border-accent-dark"
-                >
-                    @if ($drink->image_path)
-                        <img src="{{ asset('storage/'.$drink->image_path) }}" alt="{{ $drink->name }}" class="h-16 w-16 rounded-full object-cover">
-                    @else
-                        <span class="flex h-16 w-16 items-center justify-center rounded-full bg-accent/10 text-2xl font-semibold text-accent dark:bg-accent-dark/10 dark:text-accent-dark">
-                            {{ mb_strtoupper(mb_substr($drink->name, 0, 1)) }}
-                        </span>
-                    @endif
-                    <span class="font-semibold text-ink dark:text-ink-dark">{{ $drink->name }}</span>
-                    <span class="text-sm tabular-nums text-muted dark:text-muted-dark">{{ number_format($drink->price, 2) }} €</span>
-                </button>
+                @if ($drink->isOutOfStock())
+                    <div class="flex cursor-not-allowed flex-col items-center gap-3 rounded-2xl border border-line bg-surface p-5 text-center opacity-50 dark:border-line-dark dark:bg-surface-dark">
+                        @if ($drink->image_path)
+                            <img src="{{ asset('storage/'.$drink->image_path) }}" alt="{{ $drink->name }}" class="h-16 w-16 rounded-full object-cover grayscale">
+                        @else
+                            <span class="flex h-16 w-16 items-center justify-center rounded-full bg-muted/10 text-2xl font-semibold text-muted dark:bg-muted-dark/10 dark:text-muted-dark">
+                                {{ mb_strtoupper(mb_substr($drink->name, 0, 1)) }}
+                            </span>
+                        @endif
+                        <span class="font-semibold text-ink dark:text-ink-dark">{{ $drink->name }}</span>
+                        <span class="text-sm font-medium text-muted dark:text-muted-dark">Out of stock</span>
+                    </div>
+                @else
+                    <button
+                        type="button"
+                        wire:click="buy({{ $drink->id }})"
+                        class="flex flex-col items-center gap-3 rounded-2xl border border-line bg-surface p-5 text-center transition hover:border-accent hover:-translate-y-0.5 dark:border-line-dark dark:bg-surface-dark dark:hover:border-accent-dark"
+                    >
+                        @if ($drink->image_path)
+                            <img src="{{ asset('storage/'.$drink->image_path) }}" alt="{{ $drink->name }}" class="h-16 w-16 rounded-full object-cover">
+                        @else
+                            <span class="flex h-16 w-16 items-center justify-center rounded-full bg-accent/10 text-2xl font-semibold text-accent dark:bg-accent-dark/10 dark:text-accent-dark">
+                                {{ mb_strtoupper(mb_substr($drink->name, 0, 1)) }}
+                            </span>
+                        @endif
+                        <span class="font-semibold text-ink dark:text-ink-dark">{{ $drink->name }}</span>
+                        <span class="text-sm tabular-nums text-muted dark:text-muted-dark">{{ number_format($drink->price, 2) }} €</span>
+                    </button>
+                @endif
             @empty
                 <p class="col-span-full py-12 text-center text-muted dark:text-muted-dark">No drinks available — ask an admin to add one.</p>
             @endforelse

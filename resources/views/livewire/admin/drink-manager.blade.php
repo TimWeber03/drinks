@@ -32,10 +32,21 @@
                 <x-input-error :messages="$errors->get('image')" class="mt-2" />
             </div>
 
-            <label class="flex items-center gap-2 sm:col-span-2">
+            <label class="flex items-center gap-2">
                 <input type="checkbox" wire:model="active" class="rounded border-line text-accent focus:ring-accent dark:border-line-dark dark:bg-surface-dark">
                 <span class="text-sm text-ink dark:text-ink-dark">Active (visible in the kiosk)</span>
             </label>
+
+            <label class="flex items-center gap-2">
+                <input type="checkbox" wire:model.live="stockTracked" class="rounded border-line text-accent focus:ring-accent dark:border-line-dark dark:bg-surface-dark">
+                <span class="text-sm text-ink dark:text-ink-dark">Track stock</span>
+            </label>
+
+            <div class="sm:col-span-2">
+                <x-input-label for="stock" value="Stock quantity" />
+                <x-text-input id="stock" type="number" step="1" min="0" class="mt-1 block w-full sm:w-40" wire:model="stock" :disabled="! $stockTracked" />
+                <x-input-error :messages="$errors->get('stock')" class="mt-2" />
+            </div>
 
             <div class="flex gap-3 sm:col-span-2">
                 <x-primary-button type="submit">Save</x-primary-button>
@@ -51,6 +62,7 @@
                     <th class="px-4 py-3 font-medium">Name</th>
                     <th class="px-4 py-3 font-medium">Price</th>
                     <th class="px-4 py-3 font-medium">Bottle size</th>
+                    <th class="px-4 py-3 font-medium">Stock</th>
                     <th class="px-4 py-3 font-medium">Status</th>
                     <th class="px-4 py-3"></th>
                 </tr>
@@ -61,6 +73,13 @@
                         <td class="px-4 py-3 font-medium text-ink dark:text-ink-dark">{{ $drink->name }}</td>
                         <td class="px-4 py-3 tabular-nums text-ink dark:text-ink-dark">{{ number_format($drink->price, 2) }} €</td>
                         <td class="px-4 py-3 tabular-nums text-muted dark:text-muted-dark">{{ $drink->bottle_size ? number_format($drink->bottle_size, 2).' l' : '—' }}</td>
+                        <td @class([
+                            'px-4 py-3 tabular-nums',
+                            'text-muted dark:text-muted-dark' => ! $drink->stock_tracked || $drink->stock > 0,
+                            'font-semibold text-negative dark:text-negative-dark' => $drink->stock_tracked && $drink->stock <= 0,
+                        ])>
+                            {{ $drink->stock_tracked ? $drink->stock : 'Unlimited' }}
+                        </td>
                         <td class="px-4 py-3">
                             <button
                                 wire:click="toggleActive({{ $drink->id }})"

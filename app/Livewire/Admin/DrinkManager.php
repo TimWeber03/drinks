@@ -28,6 +28,10 @@ class DrinkManager extends Component
 
     public bool $active = true;
 
+    public bool $stockTracked = false;
+
+    public string $stock = '';
+
     public function create(): void
     {
         $this->resetForm();
@@ -41,6 +45,8 @@ class DrinkManager extends Component
         $this->price = (string) $drink->price;
         $this->bottleSize = $drink->bottle_size !== null ? (string) $drink->bottle_size : '';
         $this->active = $drink->active;
+        $this->stockTracked = $drink->stock_tracked;
+        $this->stock = (string) $drink->stock;
         $this->showForm = true;
         $this->resetErrorBag();
     }
@@ -52,6 +58,7 @@ class DrinkManager extends Component
             'price' => ['required', 'numeric', 'min:0'],
             'bottleSize' => ['nullable', 'numeric', 'min:0'],
             'image' => ['nullable', 'image', 'max:2048'],
+            'stock' => ['nullable', 'integer', 'min:0'],
         ]);
 
         $attributes = [
@@ -59,6 +66,8 @@ class DrinkManager extends Component
             'price' => $data['price'],
             'bottle_size' => $data['bottleSize'] !== '' ? $data['bottleSize'] : null,
             'active' => $this->active,
+            'stock_tracked' => $this->stockTracked,
+            'stock' => $this->stockTracked ? (int) $data['stock'] : 0,
         ];
 
         if ($this->image) {
@@ -86,7 +95,7 @@ class DrinkManager extends Component
 
     private function resetForm(): void
     {
-        $this->reset(['editingId', 'name', 'price', 'bottleSize', 'image', 'showForm']);
+        $this->reset(['editingId', 'name', 'price', 'bottleSize', 'image', 'showForm', 'stockTracked', 'stock']);
         $this->active = true;
         $this->resetErrorBag();
     }

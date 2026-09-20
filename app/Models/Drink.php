@@ -18,6 +18,8 @@ class Drink extends Model
         'bottle_size',
         'image_path',
         'active',
+        'stock_tracked',
+        'stock',
         'legacy_id',
     ];
 
@@ -27,11 +29,18 @@ class Drink extends Model
             'price' => 'decimal:2',
             'bottle_size' => 'decimal:2',
             'active' => 'boolean',
+            'stock_tracked' => 'boolean',
+            'stock' => 'integer',
         ];
     }
 
     public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class);
+    }
+
+    public function isOutOfStock(): bool
+    {
+        return $this->stock_tracked && $this->stock <= 0;
     }
 }

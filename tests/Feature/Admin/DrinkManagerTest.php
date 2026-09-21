@@ -16,9 +16,9 @@ class DrinkManagerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_guests_are_redirected_to_login(): void
+    public function test_guests_can_open_the_management_view(): void
     {
-        $this->get(route('admin.drinks'))->assertRedirect(route('login'));
+        $this->get(route('admin.drinks'))->assertOk();
     }
 
     public function test_admin_can_create_a_drink(): void

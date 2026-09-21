@@ -106,9 +106,10 @@ class Drinker extends Model
     }
 
     /**
-     * Manually correct this drinker's balance by a signed amount.
+     * Manually correct this drinker's balance by a signed amount. The
+     * management view is open, so there is not always an admin to credit.
      */
-    public function adjustBalance(float $amount, User $createdBy): Transaction
+    public function adjustBalance(float $amount, ?User $createdBy = null): Transaction
     {
         return $this->applyBalanceChange(
             amount: $amount,

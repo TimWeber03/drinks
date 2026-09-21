@@ -12,9 +12,9 @@ class UserManagerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_guests_are_redirected_to_login(): void
+    public function test_guests_can_open_the_management_view(): void
     {
-        $this->get(route('admin.admins'))->assertRedirect(route('login'));
+        $this->get(route('admin.admins'))->assertOk();
     }
 
     public function test_admin_can_create_another_admin(): void

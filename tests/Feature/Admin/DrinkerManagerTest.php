@@ -17,9 +17,9 @@ class DrinkerManagerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_guests_are_redirected_to_login(): void
+    public function test_guests_can_open_the_management_view(): void
     {
-        $this->get(route('admin.drinkers'))->assertRedirect(route('login'));
+        $this->get(route('admin.drinkers'))->assertOk();
     }
 
     public function test_admin_can_create_a_drinker(): void
@@ -52,6 +52,24 @@ class DrinkerManagerTest extends TestCase
             'drinker_id' => $drinker->id,
             'type' => TransactionType::Adjustment->value,
             'created_by' => $admin->id,
+        ]);
+    }
+
+    public function test_a_guest_can_adjust_a_balance_without_an_admin_on_record(): void
+    {
+        $drinker = Drinker::factory()->create(['balance' => 5]);
+
+        Livewire::test(DrinkerManager::class)
+            ->call('startAdjustment', $drinker->id)
+            ->set('adjustmentAmount', '-2')
+            ->call('applyAdjustment')
+            ->assertHasNoErrors();
+
+        $this->assertSame('3.00', $drinker->fresh()->balance);
+        $this->assertDatabaseHas('transactions', [
+            'drinker_id' => $drinker->id,
+            'type' => TransactionType::Adjustment->value,
+            'created_by' => null,
         ]);
     }
 

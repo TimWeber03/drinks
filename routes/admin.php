@@ -6,7 +6,7 @@ use App\Livewire\Admin\TransactionLog;
 use App\Livewire\Admin\UserManager;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
+Route::prefix('admin')->group(function () {
     Route::get('drinks', DrinkManager::class)->name('admin.drinks');
     Route::get('drinkers', DrinkerManager::class)->name('admin.drinkers');
     Route::get('transactions', TransactionLog::class)->name('admin.transactions');

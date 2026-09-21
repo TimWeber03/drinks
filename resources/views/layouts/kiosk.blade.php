@@ -40,15 +40,9 @@
                             Activity
                         </a>
 
-                        @auth
-                            <a href="{{ route('dashboard') }}" wire:navigate class="text-muted hover:text-ink dark:text-muted-dark dark:hover:text-ink-dark">
-                                Admin
-                            </a>
-                        @else
-                            <a href="{{ route('login') }}" wire:navigate class="text-muted hover:text-ink dark:text-muted-dark dark:hover:text-ink-dark">
-                                Admin login
-                            </a>
-                        @endauth
+                        <a href="{{ route('dashboard') }}" wire:navigate class="text-muted hover:text-ink dark:text-muted-dark dark:hover:text-ink-dark">
+                            Management
+                        </a>
                     </div>
                 </div>
             </header>

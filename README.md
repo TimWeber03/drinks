@@ -9,7 +9,7 @@
 
 A self-hosted, honesty-based drinks tally for offices, hackerspaces, and other shared spaces. People keep a running balance, tap a drink to deduct its price, and top up whenever they like — no cash register, no per-purchase login.
 
-It's built around a fast "tap your name, tap a drink" kiosk flow, with a real admin login, per-drink stock tracking, and a one-way import tool for migrating data from a compatible legacy system.
+It's built around a fast "tap your name, tap a drink" kiosk flow, with an open management view, per-drink stock tracking, and a one-way import tool for migrating data from a compatible legacy system.
 
 ## Features
 
@@ -18,12 +18,14 @@ It's built around a fast "tap your name, tap a drink" kiosk flow, with a real ad
 - Deposit money with quick-amount buttons or a custom value.
 - Per-drink stock tracking: items sell out, get greyed out automatically, and can be hidden entirely with one toggle.
 - Per-person purchase history and a site-wide recent activity feed.
+- A **Management** link in the header opens the management view directly — no login step.
 - Light/dark mode, responsive from phone to kiosk tablet to laptop.
 
-**Admin** (behind a real login)
+**Management** (open, like the kiosk)
 - Manage drinks (price, image, active/inactive, stock) and drinkers (active/inactive, avatar, manual balance corrections).
-- Manage other admin accounts — no public self-registration.
+- Manage admin accounts.
 - Full transaction log, filterable by person, drink, type, and date range.
+- No login is required to reach any of this, so the whole app — kiosk, management view and API alike — belongs on a trusted network. Accounts and the login page still exist and are used for the profile page.
 
 **API**
 - Implements the [Space-Market API v3](https://space-market.github.io/API/swagger.json) under `/v3` and the older [v1](https://github.com/Space-Market/API/blob/v1/spec/swagger.yaml) (mete-compatible) API at the root, so existing space-market clients (vending frontends, barcode scanners, dashboards) can talk to this installation.
@@ -66,9 +68,10 @@ docker run --rm \
 Then visit:
 
 - **`http://localhost`** — the kiosk
+- **`http://localhost/dashboard`** — the management view
 - **`http://localhost/login`** — admin login
 
-`migrate --seed` creates a demo admin at `admin@example.com` / `password` plus a few sample drinkers and drinks. For a real admin account, use the dedicated command instead of the seeder:
+`migrate --seed` creates a demo admin at `admin@example.com` / `password` plus a few sample drinkers and drinks. The management view doesn't require that account, but for a real one use the dedicated command instead of the seeder:
 
 ```bash
 ./vendor/bin/sail artisan app:create-admin --name="Jane Doe" --email="jane@example.com" --password="a-strong-password"
@@ -129,7 +132,7 @@ What the server reports in `GET /v3/info/` — currency, decimal separator, ener
 
 ### Authentication
 
-Neither specification defines authentication, and neither does this implementation: anyone who can reach the app can read and write through the API. Keep the installation on a trusted network, or put access control in front of it at the reverse proxy.
+Neither specification defines authentication, and neither does this implementation: anyone who can reach the app can read and write through the API, including creating and deleting drinks. Keep the installation on a trusted network, or put access control in front of it at the reverse proxy.
 
 ## Importing data from mete
 

@@ -10,9 +10,7 @@ Route::get('/', Home::class)->name('kiosk.home');
 Route::get('/activity', Activity::class)->name('kiosk.activity');
 Route::get('/drinkers/{drinker}', DrinkerHistory::class)->name('kiosk.drinker-history');
 
-Route::get('dashboard', Dashboard::class)
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+Route::get('dashboard', Dashboard::class)->name('dashboard');
 
 Route::view('profile', 'profile')
     ->middleware(['auth'])

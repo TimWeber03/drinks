@@ -50,6 +50,11 @@ new class extends Component
 
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
+                @guest
+                    <a href="{{ route('login') }}" wire:navigate class="text-sm font-medium text-muted dark:text-muted-dark hover:text-ink dark:hover:text-ink-dark">
+                        {{ __('Log In') }}
+                    </a>
+                @else
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-muted dark:text-muted-dark bg-surface dark:bg-surface-dark hover:text-ink dark:hover:text-ink-dark focus:outline-none transition ease-in-out duration-150">
@@ -76,6 +81,7 @@ new class extends Component
                         </button>
                     </x-slot>
                 </x-dropdown>
+                @endguest
             </div>
 
             <!-- Hamburger -->
@@ -112,6 +118,11 @@ new class extends Component
 
         <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-line dark:border-line-dark">
+            @guest
+                <x-responsive-nav-link :href="route('login')" wire:navigate>
+                    {{ __('Log In') }}
+                </x-responsive-nav-link>
+            @else
             <div class="px-4">
                 <div class="font-medium text-base text-ink dark:text-ink-dark" x-data="{{ json_encode(['name' => auth()->user()->name]) }}" x-text="name" x-on:profile-updated.window="name = $event.detail.name"></div>
                 <div class="font-medium text-sm text-muted dark:text-muted-dark">{{ auth()->user()->email }}</div>
@@ -129,6 +140,7 @@ new class extends Component
                     </x-responsive-nav-link>
                 </button>
             </div>
+            @endguest
         </div>
     </div>
 </nav>

@@ -47,8 +47,8 @@
                     <tr>
                         <td class="px-4 py-3">
                             <div class="flex items-center gap-3">
-                                @if ($drinker->avatar_path)
-                                    <img src="{{ asset('storage/'.$drinker->avatar_path) }}" alt="{{ $drinker->name }}" class="h-8 w-8 rounded-full object-cover">
+                                @if ($drinker->avatar)
+                                    <img src="{{ $drinker->avatar->url() }}" alt="{{ $drinker->name }}" class="h-8 w-8 rounded-full object-cover">
                                 @else
                                     <span class="flex h-8 w-8 items-center justify-center rounded-full bg-accent/10 text-xs font-semibold text-accent dark:bg-accent-dark/10 dark:text-accent-dark">
                                         {{ mb_strtoupper(mb_substr($drinker->name, 0, 1)) }}

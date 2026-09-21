@@ -16,8 +16,8 @@
                     wire:click="selectDrinker({{ $drinker->id }})"
                     class="flex flex-col items-center gap-3 rounded-2xl border border-line bg-surface p-5 text-center transition hover:border-accent hover:-translate-y-0.5 dark:border-line-dark dark:bg-surface-dark dark:hover:border-accent-dark"
                 >
-                    @if ($drinker->avatar_path)
-                        <img src="{{ asset('storage/'.$drinker->avatar_path) }}" alt="{{ $drinker->name }}" class="h-16 w-16 rounded-full object-cover">
+                    @if ($drinker->avatar)
+                        <img src="{{ $drinker->avatar->url() }}" alt="{{ $drinker->name }}" class="h-16 w-16 rounded-full object-cover">
                     @else
                         <span class="flex h-16 w-16 items-center justify-center rounded-full bg-accent/10 text-2xl font-semibold text-accent dark:bg-accent-dark/10 dark:text-accent-dark">
                             {{ mb_strtoupper(mb_substr($drinker->name, 0, 1)) }}
@@ -88,8 +88,8 @@
             @forelse ($drinks as $drink)
                 @if ($drink->isOutOfStock())
                     <div class="flex cursor-not-allowed flex-col items-center gap-3 rounded-2xl border border-line bg-surface p-5 text-center opacity-50 dark:border-line-dark dark:bg-surface-dark">
-                        @if ($drink->image_path)
-                            <img src="{{ asset('storage/'.$drink->image_path) }}" alt="{{ $drink->name }}" class="h-16 w-16 rounded-full object-cover grayscale">
+                        @if ($drink->image)
+                            <img src="{{ $drink->image->url() }}" alt="{{ $drink->name }}" class="h-16 w-16 rounded-full object-cover grayscale">
                         @else
                             <span class="flex h-16 w-16 items-center justify-center rounded-full bg-muted/10 text-2xl font-semibold text-muted dark:bg-muted-dark/10 dark:text-muted-dark">
                                 {{ mb_strtoupper(mb_substr($drink->name, 0, 1)) }}
@@ -104,8 +104,8 @@
                         wire:click="buy({{ $drink->id }})"
                         class="flex flex-col items-center gap-3 rounded-2xl border border-line bg-surface p-5 text-center transition hover:border-accent hover:-translate-y-0.5 dark:border-line-dark dark:bg-surface-dark dark:hover:border-accent-dark"
                     >
-                        @if ($drink->image_path)
-                            <img src="{{ asset('storage/'.$drink->image_path) }}" alt="{{ $drink->name }}" class="h-16 w-16 rounded-full object-cover">
+                        @if ($drink->image)
+                            <img src="{{ $drink->image->url() }}" alt="{{ $drink->name }}" class="h-16 w-16 rounded-full object-cover">
                         @else
                             <span class="flex h-16 w-16 items-center justify-center rounded-full bg-accent/10 text-2xl font-semibold text-accent dark:bg-accent-dark/10 dark:text-accent-dark">
                                 {{ mb_strtoupper(mb_substr($drink->name, 0, 1)) }}

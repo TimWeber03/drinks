@@ -7,6 +7,7 @@ enum TransactionType: string
     case Purchase = 'purchase';
     case Deposit = 'deposit';
     case Adjustment = 'adjustment';
+    case Transfer = 'transfer';
 
     public function label(): string
     {
@@ -14,6 +15,7 @@ enum TransactionType: string
             self::Purchase => 'Purchase',
             self::Deposit => 'Deposit',
             self::Adjustment => 'Adjustment',
+            self::Transfer => 'Transfer',
         };
     }
 }

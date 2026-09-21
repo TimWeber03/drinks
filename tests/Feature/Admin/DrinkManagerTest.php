@@ -4,6 +4,7 @@ namespace Tests\Feature\Admin;
 
 use App\Livewire\Admin\DrinkManager;
 use App\Models\Drink;
+use App\Models\Image;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -95,7 +96,9 @@ class DrinkManagerTest extends TestCase
         $this->actingAs(User::factory()->create());
 
         $oldPath = UploadedFile::fake()->image('old.jpg')->store('drinks', 'public');
-        $drink = Drink::factory()->create(['image_path' => $oldPath]);
+        $drink = Drink::factory()->create([
+            'image_id' => Image::create(['path' => $oldPath, 'file_name' => 'old.jpg'])->id,
+        ]);
 
         Livewire::test(DrinkManager::class)
             ->call('edit', $drink->id)
@@ -103,7 +106,7 @@ class DrinkManagerTest extends TestCase
             ->call('save');
 
         Storage::disk('public')->assertMissing($oldPath);
-        Storage::disk('public')->assertExists($drink->fresh()->image_path);
-        $this->assertNotSame($oldPath, $drink->fresh()->image_path);
+        Storage::disk('public')->assertExists($drink->fresh()->image->path);
+        $this->assertNotSame($oldPath, $drink->fresh()->image->path);
     }
 }

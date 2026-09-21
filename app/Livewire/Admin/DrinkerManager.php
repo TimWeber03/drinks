@@ -3,8 +3,8 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Drinker;
+use App\Models\Image;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -60,11 +60,9 @@ class DrinkerManager extends Component
         $drinker = $this->editingId ? Drinker::findOrFail($this->editingId) : null;
 
         if ($this->avatar) {
-            if ($drinker?->avatar_path) {
-                Storage::disk('public')->delete($drinker->avatar_path);
-            }
+            $drinker?->avatar?->deleteWithFile();
 
-            $attributes['avatar_path'] = $this->avatar->store('avatars', 'public');
+            $attributes['avatar_id'] = Image::storeUploadedFile($this->avatar, 'avatars')->id;
         }
 
         if ($drinker) {

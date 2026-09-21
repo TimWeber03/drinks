@@ -3,7 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Drink;
-use Illuminate\Support\Facades\Storage;
+use App\Models\Image;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -74,11 +74,9 @@ class DrinkManager extends Component
         $drink = $this->editingId ? Drink::findOrFail($this->editingId) : null;
 
         if ($this->image) {
-            if ($drink?->image_path) {
-                Storage::disk('public')->delete($drink->image_path);
-            }
+            $drink?->image?->deleteWithFile();
 
-            $attributes['image_path'] = $this->image->store('drinks', 'public');
+            $attributes['image_id'] = Image::storeUploadedFile($this->image, 'drinks')->id;
         }
 
         if ($drink) {

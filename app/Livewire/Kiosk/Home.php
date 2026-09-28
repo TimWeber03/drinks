@@ -98,7 +98,7 @@ class Home extends Component
         return view('livewire.kiosk.home', [
             'drinkers' => Drinker::query()
                 ->where('active', true)
-                ->when($this->search !== '', fn ($query) => $query->where('name', 'like', '%'.$this->search.'%'))
+                ->when($this->search !== '', fn ($query) => $query->whereLike('name', '%'.$this->search.'%'))
                 ->orderBy('name')
                 ->get(),
             'selectedDrinker' => $this->selectedDrinkerId

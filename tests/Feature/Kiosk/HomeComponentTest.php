@@ -23,6 +23,17 @@ class HomeComponentTest extends TestCase
             ->assertDontSee('Inactive Drinker');
     }
 
+    public function test_searching_drinkers_ignores_case(): void
+    {
+        Drinker::factory()->create(['name' => 'Alice']);
+        Drinker::factory()->create(['name' => 'Bob']);
+
+        Livewire::test(Home::class)
+            ->set('search', 'aLI')
+            ->assertSee('Alice')
+            ->assertDontSee('Bob');
+    }
+
     public function test_selecting_a_drinker_shows_active_drinks_only(): void
     {
         $drinker = Drinker::factory()->create();

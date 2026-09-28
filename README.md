@@ -70,7 +70,7 @@ volumes:
     drinks-db:
 ```
 
-Copy [`.env.example`](.env.example) to `.env` next to it and fill in production values: `APP_ENV=production`, `APP_DEBUG=false`, an `APP_KEY` (generate one with `php artisan key:generate --show`), `DB_CONNECTION=pgsql` with `DB_HOST=db` and the credentials from the `db` service, and an `APP_URL` matching the address people use, since image URLs are built from it. Once it's up, create an admin with `docker compose exec app php artisan app:create-admin`. The package is private by default, so either `docker login ghcr.io` with a token that has `read:packages`, or make the package public in its GitHub settings.
+Copy [`.env.example`](.env.example) to `.env` next to it and fill in production values: `APP_ENV=production`, `APP_DEBUG=false`, an `APP_KEY` (generate one with `php artisan key:generate --show`), `DB_CONNECTION=pgsql` with `DB_HOST=db` and the credentials from the `db` service, and an `APP_URL` matching the address people use, since image URLs are built from it. Behind a reverse proxy that terminates TLS (Traefik, Caddy, nginx), set `TRUSTED_PROXIES` to the proxy's IP or network (e.g. `172.16.0.0/12` for Docker networks), otherwise pages load their assets over `http://` and browsers block them as mixed content. `*` also works if the app's port isn't reachable except through the proxy. Set `LOG_CHANNEL=stderr` so errors show up in `docker compose logs` rather than a file inside the container. Once it's up, create an admin with `docker compose exec app php artisan app:create-admin`. The package is private by default, so either `docker login ghcr.io` with a token that has `read:packages`, or make the package public in its GitHub settings.
 
 
 ## Setup from Source
